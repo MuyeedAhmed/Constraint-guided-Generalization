@@ -268,7 +268,7 @@ if __name__ == "__main__":
     if Solution:
         if method == "CMC":
             method_suffix = f"F_{misc_type}"
-            TrainNN(dataset_name, X_train, y_train, X_test, y_test, num_classes=num_classes, patience=15, max_epochs=200000, preset_weights_path=checkpoint_path, run_id=1, Method=f"RA{method}{misclassification_count}")
+            TrainNN(dataset_name, X_train, y_train, X_test, y_test, num_classes=num_classes, patience=15, max_epochs=200000, preset_weights_path=checkpoint_path, run_id=1, Method=f"RA{method}_{misc_type}{misclassification_count}")
    
         else:
             method_suffix = "B"
@@ -276,7 +276,7 @@ if __name__ == "__main__":
         print(f"Successfully modified weights for dataset \"{dataset_name}\" using method \"{method}\".")
         print(f"Path to model_G: checkpoints/{dataset_name}_1_tabular_model_{method_suffix}.pt")
         if method == "CMC":
-            print(f"Path to model_RT (Retrain after misclassification): checkpoints/{dataset_name}_1_tabular_model_RA{method_suffix}{misclassification_count}.pt")
+            print(f"Path to model_RT (Retrain after misclassification): checkpoints/{dataset_name}_1_tabular_model_RA{method}_{misc_type}{misclassification_count}.pt")
 
     else:
         print(f"Failed to modify weights for dataset \"{dataset_name}\" using method \"{method}\".")
