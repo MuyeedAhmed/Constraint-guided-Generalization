@@ -74,4 +74,4 @@ To add a custom image dataset:
 
 ### Tabular
 
-- Also update the `TrainNN` function in `Tabular/Main.py` to incorporate your model.
+- Also update the `TrainNN` function in `Main_Tabular.py` to incorporate your model.
