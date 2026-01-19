@@ -1,5 +1,7 @@
 # Controlling Neural Network Generalization via Constraint-Guided Weight Transformations
 
+---
+
 ## Requirements
 
 - Python (≥3.7)
@@ -14,15 +16,13 @@ You can run TAGD on either image or tabular datasets.
 ### For Image Datasets:
 
 ```
-cd Image
-python Main.py TAGD
+python Main.py <Dataset Name> TAGD
 ```
 
 ### For Tabular Datasets:
 
 ```
-cd Tabular
-python Main.py TAGD
+python Main.py <Dataset Name> TAGD
 ```
 
 ##  Controlled Misclassification (CMC)
@@ -32,15 +32,13 @@ You can run CMC on either image or tabular datasets.
 ### For Image Datasets:
 
 ```
-cd Image
-python Main.py CMC <Save Checkpoint(Y/N)> <Misclassification Count> <Misclassification Type>
+python Main.py <Dataset Name> CMC <Misclassification Count> <Misclassification Type>
 ```
 
 ### For Tabular Datasets:
 
 ```
-cd Tabular
-python Main.py CMC <Misclassification Type> <Misclassification Count>
+python Main_Tabular.py <Dataset Name> CMC <Misclassification Count> <Misclassification Type>
 ```
 
 ### Arguments
@@ -51,6 +49,7 @@ python Main.py CMC <Misclassification Type> <Misclassification Count>
 
 - `<Misclassification Count>`:
   - Integer specifying how many datapoints to modify via MILP
+
 ## Add Your Own Dataset
 
 ### Image
@@ -63,18 +62,16 @@ To add a custom image dataset:
 ### Tabular
 
 - If your dataset is available on OpenML, simply pass the appropriate dataset name as an argument.
-- To use a local file, see the example in the `LoadDataset` function in `Tabular/Main.py`.
-
----
+- To use a local file, see the example in the `LoadDataset` function in `Main_Tabular.py`.
 
 ## Add Your Own Architecture
 
+- Modify the `Utils/Networks.py` file to define your architecture.
+
 ### Image
 
-- Modify the `Utils/CNNetworks.py` file to define your architecture.
-- Also update the `GetModel` function in `Utils/GetModelsDatasets.py` to load your model.
+- Update the `GetModel` function in `Utils/GetModelsDatasets.py` to load your model.
 
 ### Tabular
 
-- Modify the `Tabular/Networks.py` file to define your architecture.
 - Also update the `TrainNN` function in `Tabular/Main.py` to incorporate your model.

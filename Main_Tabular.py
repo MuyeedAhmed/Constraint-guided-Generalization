@@ -245,7 +245,7 @@ def ModifyWeights(Dataset, X_train, y_train, X_test, y_test, num_classes=2, n_sa
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Usage: python Main.py <Dataset_Name> <Method> <Misclassification_Count> <Misclassification_Type>")
+        print("Usage: python Main_Tabular.py <Dataset_Name> <Method> <Misclassification_Count> <Misclassification_Type>")
 
     dataset_name = sys.argv[1]
     method = sys.argv[2]

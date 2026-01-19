@@ -13,6 +13,8 @@ import sys
 import time
 import random
 import numpy as np
+
+from Utils.RunGurobi import MILP
 from Utils.TrainModel import TrainModel
 from Utils.GetModelsDatasets import GetDataset, GetModel
 
@@ -42,18 +44,15 @@ if __name__ == "__main__":
     G_epoch = 100
     
     if len(sys.argv) <= 3:
-        print("Usage: python Main.py <Dataset_Name> <Method> <Save_Checkpoint(Y/N)> <Misclassification_Count> <Misclassification_Type>")
+        print("Usage: python Main.py <Dataset_Name> <Method> <Misclassification_Count> <Misclassification_Type>")
         sys.exit(1)
     dataset_name = sys.argv[1]
     method = sys.argv[2]
-    save_checkpoint = sys.argv[3] if len(sys.argv) > 3 else "N"
     misclassification_count = int(sys.argv[4]) if len(sys.argv) > 4 else 1
     cmc_type = sys.argv[5] if len(sys.argv) > 5 else "Any"
 
     os.makedirs(f"Stats/{method}", exist_ok=True)    
-    
-    if save_checkpoint == "N":
-        from Utils.RunGurobi import MILP
+            
 
     if method == "TAGD":
         n_samples_gurobi = -1
@@ -105,9 +104,6 @@ if __name__ == "__main__":
     if os.path.exists(checkpoint_dir) == False:
         TM = TrainModel(method, dataset_name, model_t, train_loader, val_loader, device, num_epochs=initEpoch, resume_epochs=G_epoch, batch_size=BatchSize, learning_rate=learningRate, optimizer_type=optimize, scheduler_type=scheduler_type, phase="Train", run_id=i, start_experiment=True)
         TM.run()
-    
-    if save_checkpoint == "Y":
-        sys.exit()
 
     results = []
 
