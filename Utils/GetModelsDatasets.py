@@ -8,7 +8,7 @@ from torch.utils.data import random_split, DataLoader, Subset
 import random
 import numpy as np
 
-from Utils.CNNetworks import ResNet18, NIN_MNIST, NIN_EMNIST, VGG, CNN_USPS, VGG_office31
+from Utils.Networks import ResNet18, NIN_MNIST, NIN_EMNIST, VGG, CNN_USPS, VGG_office31
 
 def GetModel(dataset_name, num_classes=10, device=None, extra_conv_layers=0):
     if dataset_name == "MNIST":

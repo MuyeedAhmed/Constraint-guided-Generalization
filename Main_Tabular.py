@@ -6,11 +6,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 import numpy as np
 import os
-import pandas as pd
 import sys
+import pandas as pd
 
-from Networks import TabularMLP, TabularMLP_Mult
-from RunGurobi import FlipBinary_A, FlipBinary_C, FlipMulticlass_A, FlipMulticlass_C, BorderBinary, BorderMulticlass
+from Utils.Networks import TabularMLP, TabularMLP_Mult
+from Utils.RunGurobi_Tabular import FlipBinary_A, FlipBinary_C, FlipMulticlass_A, FlipMulticlass_C, BorderBinary, BorderMulticlass
 
 
 def LoadDataset(name="adult", run_id=0):
@@ -218,7 +218,7 @@ def ModifyWeights(Dataset, X_train, y_train, X_test, y_test, num_classes=2, n_sa
     if G_result is not None:
         W_new, b_new = G_result
     else:
-        return False
+        return False, None
     W_new = torch.tensor(W_new, dtype=torch.float32)
     b_new = torch.tensor(b_new, dtype=torch.float32)
     
@@ -240,34 +240,36 @@ def ModifyWeights(Dataset, X_train, y_train, X_test, y_test, num_classes=2, n_sa
 
     torch.save(model.state_dict(), G_checkpoint_path)
 
-    TrainNN(Dataset, X_train, y_train, X_test, y_test, num_classes=num_classes, patience=15, max_epochs=200000, preset_weights_path=G_checkpoint_path, run_id=run_id, Method=f"RA{Method}{flipCount}")
-    
-    return True
+    return True, G_checkpoint_path
+
 
 if __name__ == "__main__":
+    if len(sys.argv) < 3:
+        print("Usage: python Main.py <Dataset_Name> <Method> <Misclassification_Count> <Misclassification_Type>")
+
     dataset_name = sys.argv[1]
-    method = sys.argv[2] if len(sys.argv) > 2 else "TAGD"
-    misc_type = sys.argv[3] if len(sys.argv) > 3 else "A"
-    misclassification_count = int(sys.argv[4]) if len(sys.argv) > 4 else 1
+    method = sys.argv[2]
+    misclassification_count = int(sys.argv[3]) if len(sys.argv) > 3 else 1
+    misc_type = sys.argv[4] if len(sys.argv) > 4 else "A"
+    subset_size = 1000
+    X_train, y_train, X_test, y_test, num_classes = LoadDataset(Datasets[0], run_id=0)
 
-    # Datasets = ["Adult", "higgs", "GiveMeSomeCredit", "bank-marketing", "santander"]
+    TrainNN(dataset, X_train, y_train, X_test, y_test, num_classes=num_classes, patience=25, max_epochs=200000, preset_weights_path=None, run_id=run, Method="Train")
 
-    X_train, y_train, X_test, y_test, num_classes = LoadDataset(dataset_name, run_id=1)
-    
-    TrainNN(dataset_name, X_train, y_train, X_test, y_test, num_classes=num_classes, patience=15, max_epochs=200000, preset_weights_path=None, run_id=1, Method="Train")
-    
     if method == "CMC":
         if misc_type == "A":
-            Solution = ModifyWeights(dataset_name, X_train, y_train, X_test, y_test, num_classes=num_classes, n_samples=1000, flipCount=misclassification_count, tol=1e-5, run_id=1, Method="F_A")
+            Solution, checkpoint_path = ModifyWeights(dataset_name, X_train, y_train, X_test, y_test, num_classes=num_classes, n_samples=subset_size, flipCount=misclassification_count, tol=1e-5, run_id=1, Method="F_A")
         elif misc_type == "C":
-            Solution = ModifyWeights(dataset_name, X_train, y_train, X_test, y_test, num_classes=num_classes, n_samples=1000, flipCount=misclassification_count, tol=1e-5, run_id=1, Method="F_C")
+            Solution, checkpoint_path = ModifyWeights(dataset_name, X_train, y_train, X_test, y_test, num_classes=num_classes, n_samples=subset_size, flipCount=misclassification_count, tol=1e-5, run_id=1, Method="F_C")
 
     elif method == "TAGD":
-        Solution = ModifyWeights(dataset_name, X_train, y_train, X_test, y_test, num_classes=num_classes, n_samples=-1, flipCount=0, tol=1e-5, run_id=1, Method="B")
+        Solution, checkpoint_path = ModifyWeights(dataset_name, X_train, y_train, X_test, y_test, num_classes=num_classes, n_samples=-1, flipCount=0, tol=1e-5, run_id=1, Method="B")
 
     if Solution:
         if method == "CMC":
             method_suffix = f"F_{misc_type}"
+            TrainNN(Dataset, X_train, y_train, X_test, y_test, num_classes=num_classes, patience=15, max_epochs=200000, preset_weights_path=G_checkpoint_path, run_id=run_id, Method=f"RA{method}{misclassification_count}")
+   
         else:
             method_suffix = "B"
 
